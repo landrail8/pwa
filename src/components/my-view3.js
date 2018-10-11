@@ -34,7 +34,7 @@ import { ButtonSharedStyles } from './button-shared-styles.js';
 import { addToCartIcon } from './my-icons.js';
 
 class MyView3 extends connect(store)(PageViewElement) {
-  _render({_quantity, _error}) {
+  render() {
     return html`
       ${SharedStyles}
       ${ButtonSharedStyles}
@@ -65,7 +65,7 @@ class MyView3 extends connect(store)(PageViewElement) {
 
       <section>
         <h2>Redux example: shopping cart</h2>
-        <div class="cart">${addToCartIcon}<div class="circle small">${_quantity}</div></div>
+        <div class="cart">${addToCartIcon}<div class="circle small">${this._quantity}</div></div>
         <p>This is a slightly more advanced Redux example, that simulates a
           shopping cart: getting the products, adding/removing items to the
           cart, and a checkout action, that can sometimes randomly fail (to
@@ -81,11 +81,10 @@ class MyView3 extends connect(store)(PageViewElement) {
         <h3>Your Cart</h3>
         <shop-cart></shop-cart>
 
-        <div>${_error}</div>
+        <div>${this._error}</div>
         <br>
         <p>
-          <button hidden="${_quantity == 0}"
-              on-click="${() => store.dispatch(checkout())}">
+          <button ?hidden="${this._quantity == 0}" @click="${this._checkoutButtonClicked}">
             Checkout
           </button>
         </p>
@@ -95,12 +94,16 @@ class MyView3 extends connect(store)(PageViewElement) {
 
   static get properties() { return {
     // This is the data from the store.
-    _quantity: Number,
-    _error: String
+    _quantity: { type: Number },
+    _error: { type: String },
   }}
 
+  _checkoutButtonClicked() {
+    store.dispatch(checkout());
+  }
+
   // This is called every time something is updated in the store.
-  _stateChanged(state) {
+  stateChanged(state) {
     this._quantity = cartQuantitySelector(state);
     this._error = state.shop.error;
   }
